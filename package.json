@@ -1,0 +1,157 @@
+{
+    "name": "workspace-chameleon",
+    "displayName": "Workspace Chameleon (Auto Theme & Color Switcher)",
+    "description": "Like a chameleon adapting to its habitat, your IDE automatically switches color themes and visual accents based on the active folder or project.",
+    "version": "1.0.0",
+    "publisher": "uziel",
+    "icon": "icon.png",
+    "engines": {
+        "vscode": "^1.75.0"
+    },
+    "categories": [
+        "Themes",
+        "Other"
+    ],
+    "keywords": [
+        "chameleon",
+        "workspace",
+        "folder-theme",
+        "theme-switcher",
+        "auto-theme",
+        "antigravity",
+        "color-palette",
+        "peacock",
+        "productivity",
+        "project-colors"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/uzielweb/workspace-chameleon.git"
+    },
+    "homepage": "https://github.com/uzielweb/workspace-chameleon#readme",
+    "bugs": {
+        "url": "https://github.com/uzielweb/workspace-chameleon/issues"
+    },
+    "main": "./src/extension.js",
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "workspaceChameleon.menu",
+                "title": "Workspace Chameleon: Open Quick Menu",
+                "icon": "$(paintcan)"
+            },
+            {
+                "command": "workspaceChameleon.setThemeForCurrentFolder",
+                "title": "Workspace Chameleon: Select Theme for Current Folder"
+            },
+            {
+                "command": "workspaceChameleon.setAccentColorForCurrentFolder",
+                "title": "Workspace Chameleon: Set Accent Color for Current Folder"
+            },
+            {
+                "command": "workspaceChameleon.autoAssignTheme",
+                "title": "Workspace Chameleon: Auto-Assign Theme from Installed Library"
+            },
+            {
+                "command": "workspaceChameleon.generateUniqueColor",
+                "title": "Workspace Chameleon: Auto-Generate Unique Palette for Current Folder"
+            },
+            {
+                "command": "workspaceChameleon.browsePopularThemes",
+                "title": "Workspace Chameleon: Discover & Download Popular Themes"
+            },
+            {
+                "command": "workspaceChameleon.clearFolderRule",
+                "title": "Workspace Chameleon: Clear Rule for Current Folder"
+            },
+            {
+                "command": "workspaceChameleon.refresh",
+                "title": "Workspace Chameleon: Refresh / Re-apply Rules"
+            },
+            {
+                "command": "workspaceChameleon.openSettings",
+                "title": "Workspace Chameleon: Open Settings"
+            }
+        ],
+        "configuration": {
+            "title": "Workspace Chameleon",
+            "properties": {
+                "workspaceChameleon.enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable or disable automatic workspace theme switching."
+                },
+                "workspaceChameleon.mode": {
+                    "type": "string",
+                    "enum": [
+                        "both",
+                        "theme",
+                        "accent"
+                    ],
+                    "enumDescriptions": [
+                        "Apply both Color Theme (syntax & editor) and Titlebar/Statusbar Accent colors.",
+                        "Apply only Color Themes without modifying Titlebar/Statusbar accent colors.",
+                        "Apply only Titlebar/Statusbar Accent colors (preserves your global syntax theme)."
+                    ],
+                    "default": "both",
+                    "description": "Determines whether to switch full editor themes, titlebar/statusbar accent colors, or both."
+                },
+                "workspaceChameleon.autoGeneratePalette": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "When no rule exists for a folder, automatically generate a deterministic harmonious accent color based on the folder path."
+                },
+                "workspaceChameleon.autoAssignFromInstalledThemes": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "When no rule exists for a folder, automatically pick a distinct theme from your installed extensions library."
+                },
+                "workspaceChameleon.showStatusBarItem": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show interactive Chameleon indicator and quick menu in the status bar."
+                },
+                "workspaceChameleon.rules": {
+                    "type": "array",
+                    "default": [],
+                    "description": "List of folder matching rules and their corresponding theme or accent color.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "path": {
+                                "type": "string",
+                                "description": "Absolute folder path or glob pattern (e.g. 'd:/projects/app1', '**/joomla-*', '*client*')."
+                            },
+                            "folderName": {
+                                "type": "string",
+                                "description": "Folder / workspace directory name (e.g. 'my-api', 'copa-*')."
+                            },
+                            "theme": {
+                                "type": "string",
+                                "description": "Name of the installed color theme to apply (e.g. 'Tokyo Night', 'Catppuccin Mocha')."
+                            },
+                            "iconTheme": {
+                                "type": "string",
+                                "description": "Optional icon theme to apply for this folder."
+                            },
+                            "accentColor": {
+                                "type": "string",
+                                "description": "HEX color code for Titlebar, Activity Bar, and Status Bar (e.g. '#7952d6')."
+                            },
+                            "colorCustomizations": {
+                                "type": "object",
+                                "description": "Raw VS Code workbench.colorCustomizations object for advanced customization."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "scripts": {
+        "test": "node test/test.js"
+    }
+}
