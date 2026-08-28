@@ -18,9 +18,11 @@ const RECOMMENDED_THEMES = [
 
 /**
  * Scans all installed extensions and returns a complete list of installed color themes.
+ * @param {Array|null} mockExtensions
+ * @param {boolean} darkOnly
  * @returns {Array<{label: string, id: string, extensionName: string, uiTheme: string}>}
  */
-function getInstalledThemes(mockExtensions = null) {
+function getInstalledThemes(mockExtensions = null, darkOnly = false) {
     const themes = [];
     const seen = new Set();
     const extensions = mockExtensions || (vscode && vscode.extensions && vscode.extensions.all) || [];
@@ -30,12 +32,18 @@ function getInstalledThemes(mockExtensions = null) {
         if (pkg && pkg.contributes && Array.isArray(pkg.contributes.themes)) {
             for (const t of pkg.contributes.themes) {
                 const label = t.label || t.id;
+                const uiTheme = t.uiTheme || 'vs-dark';
+
+                if (darkOnly && (uiTheme === 'vs' || label.toLowerCase().includes('light') || label.toLowerCase().includes('suave') || label.toLowerCase().includes('claro'))) {
+                    continue;
+                }
+
                 if (label && !seen.has(label)) {
                     seen.add(label);
                     themes.push({
                         label: label,
                         id: t.id || label,
-                        uiTheme: t.uiTheme || 'vs-dark',
+                        uiTheme: uiTheme,
                         extensionName: pkg.displayName || pkg.name || extension.id
                     });
                 }
@@ -48,29 +56,65 @@ function getInstalledThemes(mockExtensions = null) {
 }
 
 /**
- * Deterministically picks one of the installed themes based on a string hash (e.g. folder path).
+ * Deterministically picks one of the installed dark themes based on a string hash (e.g. folder name or path).
  * @param {string} seed 
- * @param {string} [preferredUiTheme] 'vs-dark', 'vs', 'hc-black'
+ * @param {string|null} [preferredUiTheme] Optional filter ('vs-dark', 'vs', 'hc-black')
+ * @param {Array|null} [overrideThemes] Optional theme list for testing
  * @returns {object|null}
  */
-function getDeterministicThemeForSeed(seed, preferredUiTheme = 'vs-dark') {
-    const themes = getInstalledThemes();
-    if (themes.length === 0) return null;
+function getDeterministicThemeForSeed(seed, preferredUiTheme = 'vs-dark', overrideThemes = null) {
+    const themes = overrideThemes || getInstalledThemes(null, true);
+    if (!themes || themes.length === 0) {
+        // Fallback to all themes if no dark themes found
+        const all = overrideThemes || getInstalledThemes(null, false);
+        if (!all || all.length === 0) return null;
+        return all[0];
+    }
 
-    let filtered = themes;
+    let candidateThemes = themes;
     if (preferredUiTheme) {
         const match = themes.filter(t => t.uiTheme === preferredUiTheme);
-        if (match.length > 0) filtered = match;
+        if (match.length > 0) {
+            candidateThemes = match;
+        }
     }
 
-    let hash = 0;
-    for (let i = 0; i < seed.length; i++) {
-        hash = (hash << 5) - hash + seed.charCodeAt(i);
-        hash |= 0;
+    // FNV-1a 32-bit hash algorithm for uniform distribution across project names
+    const str = String(seed || '').trim().toLowerCase();
+    let hash = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+        hash ^= str.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
     }
 
-    const index = Math.abs(hash) % filtered.length;
-    return filtered[index];
+    const index = Math.abs(hash >>> 0) % candidateThemes.length;
+    return candidateThemes[index];
+}
+
+/**
+ * Randomly picks one of the installed dark themes.
+ * @param {string|null} [preferredUiTheme] Optional filter ('vs-dark', 'vs', 'hc-black')
+ * @param {Array|null} [overrideThemes] Optional theme list for testing
+ * @returns {object|null}
+ */
+function getRandomInstalledTheme(preferredUiTheme = 'vs-dark', overrideThemes = null) {
+    const themes = overrideThemes || getInstalledThemes(null, true);
+    if (!themes || themes.length === 0) {
+        const all = overrideThemes || getInstalledThemes(null, false);
+        if (!all || all.length === 0) return null;
+        return all[Math.floor(Math.random() * all.length)];
+    }
+
+    let candidateThemes = themes;
+    if (preferredUiTheme) {
+        const match = themes.filter(t => t.uiTheme === preferredUiTheme);
+        if (match.length > 0) {
+            candidateThemes = match;
+        }
+    }
+
+    const index = Math.floor(Math.random() * candidateThemes.length);
+    return candidateThemes[index];
 }
 
 /**
@@ -152,5 +196,6 @@ module.exports = {
     RECOMMENDED_THEMES,
     getInstalledThemes,
     getDeterministicThemeForSeed,
+    getRandomInstalledTheme,
     promptSelectTheme
 };

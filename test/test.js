@@ -62,10 +62,35 @@ const match2 = findMatchingRule('d:/laragon/www/other/minimalista', 'minimalista
 assert.ok(match2, 'Should match minimalista by folderName');
 assert.strictEqual(match2.accentColor, '#10b981');
 
-// 3. Test Theme Manager Data
-console.log('Testing Theme Manager recommendations...');
+// 3. Test Theme Manager Data & Deterministic Auto-Assign
+console.log('Testing Theme Manager recommendations & auto-assign...');
 assert.ok(Array.isArray(RECOMMENDED_THEMES), 'Recommended themes must be an array');
 assert.ok(RECOMMENDED_THEMES.length > 0, 'Recommended themes must not be empty');
 assert.ok(RECOMMENDED_THEMES.some(t => t.id === 'enkia.tokyo-night'), 'Should contain Tokyo Night');
 
-console.log('✓ All 15 test assertions passed successfully!');
+const { getDeterministicThemeForSeed, getRandomInstalledTheme } = require('../src/themeManager');
+const mockInstalled = [
+    { label: 'Tokyo Night', id: 'tokyo-night', uiTheme: 'vs-dark' },
+    { label: 'Catppuccin Mocha', id: 'catppuccin-mocha', uiTheme: 'vs-dark' },
+    { label: 'Dracula', id: 'dracula', uiTheme: 'vs-dark' },
+    { label: 'One Dark Pro', id: 'one-dark-pro', uiTheme: 'vs-dark' },
+    { label: 'Nord', id: 'nord', uiTheme: 'vs-dark' },
+    { label: 'GitHub Dark', id: 'github-dark', uiTheme: 'vs-dark' }
+];
+
+const assigned1 = getDeterministicThemeForSeed('workspace-chameleon', null, mockInstalled);
+const assigned2 = getDeterministicThemeForSeed('workspace-chameleon', null, mockInstalled);
+const assigned3 = getDeterministicThemeForSeed('antigravity-guide', null, mockInstalled);
+
+assert.ok(assigned1, 'Assigned theme must not be null');
+assert.strictEqual(assigned1.label, assigned2.label, 'Same project name must always yield the exact same theme');
+assert.ok(mockInstalled.some(t => t.label === assigned1.label), 'Assigned theme must come from installed themes library');
+
+const randomTheme = getRandomInstalledTheme('vs-dark', mockInstalled);
+assert.ok(randomTheme, 'Random theme must not be null');
+assert.ok(mockInstalled.some(t => t.label === randomTheme.label), 'Random theme must be from library');
+
+console.log(`✓ Project "workspace-chameleon" deterministically assigned -> ${assigned1.label}`);
+console.log(`✓ Project "antigravity-guide" deterministically assigned -> ${assigned3.label}`);
+console.log(`✓ Random pick test -> ${randomTheme.label}`);
+console.log('✓ All test assertions passed successfully!');
