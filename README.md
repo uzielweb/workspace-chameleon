@@ -1,6 +1,6 @@
 # 🦎 Workspace Chameleon (Auto Theme & Color Switcher)
 
-[![Version](https://img.shields.io/badge/version-1.5.0-6366f1.svg)](https://github.com/uzielweb/workspace-chameleon/releases)
+[![Version](https://img.shields.io/badge/version-1.5.1-6366f1.svg)](https://github.com/uzielweb/workspace-chameleon/releases)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.75.0-007ACC.svg)](https://code.visualstudio.com/)
 [![Antigravity IDE](https://img.shields.io/badge/Antigravity%20IDE-Compatible-10b981.svg)](https://github.com/uzielweb/workspace-chameleon)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -52,7 +52,7 @@ O **Workspace Chameleon** resolve isso transformando visualmente cada janela do 
 2. No VS Code ou Antigravity IDE:
    - Pressione `Ctrl+Shift+P` (ou `Cmd+Shift+P` no macOS).
    - Digite `Extensions: Install from VSIX...` (ou `Instalar a partir de VSIX...`).
-   - Selecione o arquivo `workspace-chameleon-1.5.0.vsix`.
+   - Selecione o arquivo `workspace-chameleon-1.5.1.vsix`.
 
 ---
 

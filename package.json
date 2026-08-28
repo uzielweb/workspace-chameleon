@@ -2,7 +2,7 @@
     "name": "workspace-chameleon",
     "displayName": "Workspace Chameleon (Auto Theme & Color Switcher)",
     "description": "Like a chameleon adapting to its habitat, your IDE automatically switches color themes and visual accents based on the active folder or project.",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "publisher": "uziel",
     "icon": "icon.png",
     "engines": {
@@ -95,16 +95,16 @@
                 "workspaceChameleon.mode": {
                     "type": "string",
                     "enum": [
-                        "theme",
                         "both",
+                        "theme",
                         "accent"
                     ],
                     "enumDescriptions": [
-                        "Apply only Color Themes without modifying Titlebar/Statusbar accent colors.",
                         "Apply both Color Theme (syntax & editor) and Titlebar/Statusbar Accent colors.",
+                        "Apply only Color Themes without modifying Titlebar/Statusbar accent colors.",
                         "Apply only Titlebar/Statusbar Accent colors (preserves your global syntax theme)."
                     ],
-                    "default": "theme",
+                    "default": "both",
                     "description": "Determines whether to switch full editor themes, titlebar/statusbar accent colors, or both."
                 },
                 "workspaceChameleon.autoAssignFromInstalledThemes": {

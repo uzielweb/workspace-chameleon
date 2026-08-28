@@ -197,7 +197,7 @@ async function applyThemeForCurrentWorkspace(showNotification = false) {
         let activeTheme = null;
         let activeColor = null;
 
-        // If local workspace settings already has a theme and no explicit rule exists, adopt it!
+        // If local workspace settings already has a theme/colors and no explicit rule exists, adopt them!
         if (currentWsTheme && !matchingRule) {
             matchingRule = {
                 path: ws.path.replace(/\\/g, '/'),
@@ -225,7 +225,7 @@ async function applyThemeForCurrentWorkspace(showNotification = false) {
             ensureGitExclude(ws.path);
 
             // 1. Apply Theme to Workspace target in one single shot (no-op if already set)
-            if ((mode === 'theme' || mode === 'both') && matchingRule.theme) {
+            if (matchingRule.theme && (mode === 'theme' || mode === 'both')) {
                 if (currentWsTheme !== matchingRule.theme) {
                     await workbenchConfig.update('colorTheme', matchingRule.theme, vscode.ConfigurationTarget.Workspace);
                 }
@@ -240,17 +240,13 @@ async function applyThemeForCurrentWorkspace(showNotification = false) {
                 }
             }
 
-            // 3. Apply Accent Color if defined
-            if ((mode === 'accent' || mode === 'both') && matchingRule.accentColor) {
+            // 3. Apply Accent Color if defined in rule
+            if (matchingRule.accentColor && (mode === 'accent' || mode === 'both')) {
                 const customColors = buildColorCustomizations(matchingRule.accentColor);
                 await workbenchConfig.update('colorCustomizations', customColors, vscode.ConfigurationTarget.Workspace);
                 activeColor = matchingRule.accentColor;
-            } else if ((mode === 'accent' || mode === 'both') && matchingRule.colorCustomizations) {
+            } else if (matchingRule.colorCustomizations && (mode === 'accent' || mode === 'both')) {
                 await workbenchConfig.update('colorCustomizations', matchingRule.colorCustomizations, vscode.ConfigurationTarget.Workspace);
-            } else if (mode === 'theme') {
-                if (currentWsColors) {
-                    await clearChameleonColorCustomizations();
-                }
             }
         } else {
             if (autoPalette && (mode === 'accent' || mode === 'both')) {
@@ -259,10 +255,6 @@ async function applyThemeForCurrentWorkspace(showNotification = false) {
                 const customColors = buildColorCustomizations(generatedHex);
                 await workbenchConfig.update('colorCustomizations', customColors, vscode.ConfigurationTarget.Workspace);
                 activeColor = generatedHex;
-            } else {
-                if (currentWsColors) {
-                    await clearChameleonColorCustomizations();
-                }
             }
         }
 
